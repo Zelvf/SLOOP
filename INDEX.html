@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>$SLOPCOIN — the bags fartcoin</title>
+  <meta name="description" content="$SLOPCOIN — the bags fartcoin. CA: Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS. Bags deserves justice."/>
+  <meta property="og:title" content="$SLOPCOIN — the bags fartcoin"/>
+  <meta property="og:description" content="bags deserves justice. CA: Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS"/>
+  <meta property="og:type" content="website"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --green: #00ff00;
+      --cyan: #00ffff;
+      --magenta: #ff00ff;
+      --gold: #ffcc00;
+      --amber: #f99c00;
+      --yellow: #ffff00;
+      --purple: #c07eff;
+      --gray: #444;
+      --dim: #222;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--bg);
+      color: var(--green);
+      font-family: 'VT323', monospace;
+      font-size: 18px;
+      line-height: 1.4;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* SCANLINES */
+    .scanlines::before {
+      content: "";
+      pointer-events: none;
+      z-index: 1000;
+      background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+
+    /* GLOWS */
+    .glow-green { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00; }
+    .glow-cyan  { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff; }
+    .glow-magenta { text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff; }
+    .glow-gold  { text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00; }
+
+    /* BLINK CURSOR */
+    @keyframes blink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
+    .cursor-blink::after { content:"█"; animation: blink 1s infinite; }
+
+    /* SCROLL TICKER */
+    @keyframes ticker { from{transform:translateX(100vw)} to{transform:translateX(-100%)} }
+    .ticker-wrap { overflow: hidden; border-top: 1px solid #00ff0033; border-bottom: 1px solid #00ff0033; background: #000; padding: 6px 0; }
+    .ticker-inner { display: inline-block; white-space: nowrap; animation: ticker 30s linear infinite; }
+    .ticker-inner span { color: var(--gold); margin-right: 60px; font-size: 1.1rem; }
+
+    /* NAV */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #00ff0022;
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+    .nav-logo {
+      font-size: 1.5rem;
+      color: var(--cyan);
+      text-shadow: 0 0 10px var(--cyan);
+      text-decoration: none;
+      letter-spacing: 0.2em;
+      font-weight: bold;
+    }
+    nav { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    nav a {
+      color: #999;
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 4px 8px;
+      border-radius: 3px;
+      transition: all 0.15s;
+      letter-spacing: 0.05em;
+    }
+    nav a:hover { color: var(--gold); background: rgba(255,204,0,0.1); }
+    nav .sep { width: 1px; height: 16px; background: #333; margin: 0 4px; }
+    nav .buy-btn {
+      background: linear-gradient(to right, var(--gold), var(--amber));
+      color: #000;
+      font-weight: bold;
+      padding: 4px 12px;
+      border-radius: 3px;
+      font-size: 0.9rem;
+    }
+    nav .buy-btn:hover { opacity: 0.85; color: #000; }
+
+    /* MOBILE MENU TOGGLE */
+    .menu-toggle { display: none; background: none; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; padding: 4px; }
+    .mobile-nav { display: none; }
+
+    @media (max-width: 768px) {
+      .desktop-nav { display: none; }
+      .menu-toggle { display: block; }
+      .mobile-nav {
+        position: fixed;
+        top: 56px; left: 0; right: 0;
+        background: rgba(0,0,0,0.97);
+        border-bottom: 1px solid #00ff0022;
+        z-index: 49;
+        padding: 12px;
+      }
+      .mobile-nav.open { display: block; }
+      .mobile-nav a {
+        display: flex; align-items: center; gap: 8px;
+        color: #aaa; text-decoration: none;
+        padding: 8px 12px;
+        border-radius: 3px;
+        font-size: 1.1rem;
+        transition: all 0.15s;
+      }
+      .mobile-nav a:hover { color: var(--gold); background: rgba(255,204,0,0.1); }
+      .mobile-nav .buy-link {
+        margin-top: 8px;
+        background: linear-gradient(to right, var(--gold), var(--amber));
+        color: #000 !important;
+        font-weight: bold;
+        text-align: center;
+        justify-content: center;
+      }
+    }
+
+    /* MAIN CONTENT */
+    main { padding-top: 56px; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem 1rem;
+      position: relative;
+      background: radial-gradient(ellipse at center, rgba(255,204,0,0.04) 0%, transparent 60%);
+    }
+
+    .hero-logo {
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+      border: 2px solid rgba(255,204,0,0.3);
+      border-radius: 50%;
+      margin-bottom: 24px;
+      box-shadow: 0 0 30px rgba(255,204,0,0.2), 0 0 60px rgba(255,204,0,0.08);
+      animation: logopulse 4s ease-in-out infinite;
+    }
+    @keyframes logopulse {
+      0%,100% { box-shadow: 0 0 30px rgba(255,204,0,0.2), 0 0 60px rgba(255,204,0,0.08); }
+      50% { box-shadow: 0 0 50px rgba(255,204,0,0.4), 0 0 90px rgba(255,204,0,0.15); }
+    }
+
+    .hero h1 {
+      font-size: clamp(3rem, 12vw, 8rem);
+      color: var(--gold);
+      text-shadow: 0 0 20px var(--gold), 0 0 40px rgba(255,204,0,0.5);
+      letter-spacing: 0.15em;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .hero .tagline {
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      color: var(--green);
+      text-shadow: 0 0 10px var(--green);
+      margin-bottom: 24px;
+      letter-spacing: 0.1em;
+    }
+    .hero .ca-box {
+      background: rgba(0,255,0,0.04);
+      border: 1px solid rgba(0,255,0,0.2);
+      border-radius: 4px;
+      padding: 10px 20px;
+      font-size: 0.85rem;
+      color: #666;
+      margin-bottom: 32px;
+      cursor: pointer;
+      transition: all 0.2s;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      word-break: break-all;
+    }
+    .hero .ca-box:hover { border-color: var(--green); color: var(--green); background: rgba(0,255,0,0.08); }
+    .hero .ca-label { color: #444; font-size: 0.75rem; display: block; margin-bottom: 4px; }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 48px; }
+    .btn-primary {
+      background: linear-gradient(to right, var(--gold), var(--amber));
+      color: #000;
+      font-weight: bold;
+      padding: 10px 28px;
+      font-size: 1.3rem;
+      border-radius: 3px;
+      text-decoration: none;
+      transition: opacity 0.15s;
+      font-family: 'VT323', monospace;
+      letter-spacing: 0.05em;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-secondary {
+      border: 1px solid rgba(0,255,255,0.4);
+      color: var(--cyan);
+      padding: 10px 28px;
+      font-size: 1.3rem;
+      border-radius: 3px;
+      text-decoration: none;
+      transition: all 0.15s;
+      font-family: 'VT323', monospace;
+      letter-spacing: 0.05em;
+    }
+    .btn-secondary:hover { border-color: var(--cyan); background: rgba(0,255,255,0.08); }
+
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .stat-item { text-align: center; }
+    .stat-label { color: #555; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .stat-val { color: var(--cyan); font-size: 1.5rem; text-shadow: 0 0 8px var(--cyan); }
+
+    /* SECTION GENERIC */
+    section { padding: 64px 1rem; max-width: 1100px; margin: 0 auto; }
+    .section-title {
+      font-size: 2.2rem;
+      color: var(--cyan);
+      text-shadow: 0 0 12px var(--cyan);
+      border-bottom: 1px solid rgba(0,255,255,0.2);
+      padding-bottom: 12px;
+      margin-bottom: 32px;
+      letter-spacing: 0.15em;
+    }
+    .section-title .sym { color: var(--gold); margin-right: 8px; }
+
+    /* ABOUT / LORE */
+    .lore-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+    @media(min-width: 640px) { .lore-grid { grid-template-columns: 1fr 1fr; } }
+    .lore-card {
+      background: rgba(0,255,255,0.03);
+      border: 1px solid rgba(0,255,255,0.1);
+      border-radius: 4px;
+      padding: 20px;
+      transition: border-color 0.2s;
+    }
+    .lore-card:hover { border-color: rgba(0,255,255,0.3); }
+    .lore-card h3 { color: var(--gold); font-size: 1.3rem; margin-bottom: 8px; letter-spacing: 0.05em; }
+    .lore-card p { color: #888; font-size: 1rem; line-height: 1.5; }
+    .lore-card p strong { color: var(--green); }
+
+    /* TRANSMISSIONS - live stream of slop thoughts */
+    .transmissions-wrapper {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(0,255,0,0.15);
+      border-radius: 4px;
+      height: 420px;
+      overflow-y: auto;
+      padding: 16px;
+      scrollbar-width: thin;
+      scrollbar-color: #333 #000;
+      position: relative;
+    }
+    .tx-line {
+      margin-bottom: 8px;
+      overflow-wrap: anywhere;
+      display: flex;
+      gap: 8px;
+    }
+    .tx-icon { color: rgba(100,100,100,0.5); flex-shrink: 0; }
+    .tx-thought { color: #fac800; white-space: pre-wrap; }
+    .tx-mem { color: #c07eff; }
+
+    /* HYPERSTITION */
+    .hyper-block {
+      background: rgba(255,0,255,0.04);
+      border-left: 4px solid rgba(255,0,255,0.5);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      border-radius: 0 4px 4px 0;
+    }
+    .hyper-block p { color: #aaa; line-height: 1.6; }
+    .hyper-block p strong { color: var(--magenta); text-shadow: 0 0 8px var(--magenta); }
+    .hyper-block .attr { color: var(--gold); font-size: 0.85rem; margin-top: 12px; }
+
+    /* ROADMAP */
+    .roadmap-phases { display: flex; flex-direction: column; gap: 0; }
+    .phase {
+      display: flex;
+      gap: 20px;
+      padding: 20px 0;
+      border-left: 1px solid #333;
+      padding-left: 24px;
+      position: relative;
+    }
+    .phase::before {
+      content: "◉";
+      position: absolute;
+      left: -10px;
+      top: 24px;
+      color: var(--gold);
+      background: var(--bg);
+      padding: 0 2px;
+      font-size: 1rem;
+    }
+    .phase.done::before { color: var(--green); }
+    .phase-content h3 { color: var(--gold); font-size: 1.2rem; margin-bottom: 6px; letter-spacing: 0.05em; }
+    .phase-content p { color: #777; font-size: 0.95rem; }
+    .phase-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 2px;
+      margin-bottom: 8px;
+      letter-spacing: 0.1em;
+    }
+    .tag-done { background: rgba(0,255,0,0.1); color: var(--green); border: 1px solid rgba(0,255,0,0.3); }
+    .tag-active { background: rgba(255,204,0,0.1); color: var(--gold); border: 1px solid rgba(255,204,0,0.3); }
+    .tag-soon { background: rgba(0,255,255,0.05); color: var(--cyan); border: 1px solid rgba(0,255,255,0.2); }
+
+    /* TOKENOMICS */
+    .toko-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(min-width: 640px) { .toko-grid { grid-template-columns: repeat(3, 1fr); } }
+    .toko-card {
+      background: rgba(255,204,0,0.03);
+      border: 1px solid rgba(255,204,0,0.12);
+      border-radius: 4px;
+      padding: 16px;
+      text-align: center;
+    }
+    .toko-card .toko-val { color: var(--gold); font-size: 1.8rem; text-shadow: 0 0 10px rgba(255,204,0,0.4); }
+    .toko-card .toko-label { color: #555; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; }
+
+    /* COMMUNITY */
+    .community-links { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media(min-width: 480px) { .community-links { grid-template-columns: 1fr 1fr; } }
+    .community-link {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border: 1px solid #222;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: all 0.2s;
+      background: rgba(255,255,255,0.02);
+    }
+    .community-link:hover { border-color: rgba(0,255,255,0.3); background: rgba(0,255,255,0.04); }
+    .community-link .link-icon { font-size: 2rem; }
+    .community-link .link-label { color: var(--cyan); font-size: 1.1rem; }
+    .community-link .link-sub { color: #555; font-size: 0.8rem; }
+
+    /* BUY SECTION */
+    .buy-section {
+      background: rgba(255,204,0,0.04);
+      border: 1px solid rgba(255,204,0,0.2);
+      border-radius: 4px;
+      padding: 40px;
+      text-align: center;
+    }
+    .buy-section h2 { color: var(--gold); font-size: 2.5rem; letter-spacing: 0.15em; margin-bottom: 16px; text-shadow: 0 0 20px var(--gold); }
+    .buy-section p { color: #888; margin-bottom: 28px; font-size: 1.1rem; line-height: 1.6; }
+    .buy-steps { display: flex; flex-direction: column; gap: 16px; max-width: 600px; margin: 0 auto 32px; }
+    @media(min-width: 640px) { .buy-steps { flex-direction: row; } }
+    .buy-step {
+      flex: 1;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 16px;
+      text-align: left;
+    }
+    .buy-step .step-num { color: var(--gold); font-size: 1.5rem; margin-bottom: 4px; }
+    .buy-step p { color: #777; font-size: 0.9rem; margin-top: 4px; }
+    .buy-step h4 { color: #aaa; font-size: 1rem; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid #111;
+      padding: 32px 1rem;
+      text-align: center;
+      color: #333;
+      font-size: 0.85rem;
+    }
+    footer a { color: #444; text-decoration: none; }
+    footer a:hover { color: var(--gold); }
+
+    /* COPY TOAST */
+    #copy-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(0,255,0,0.15);
+      border: 1px solid rgba(0,255,0,0.4);
+      color: var(--green);
+      padding: 8px 20px;
+      border-radius: 4px;
+      font-size: 1rem;
+      z-index: 9999;
+      transition: transform 0.3s ease;
+    }
+    #copy-toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: #333; }
+
+    /* FLOATING SLOP PARTICLES */
+    .slop-particle {
+      position: fixed;
+      pointer-events: none;
+      font-size: 0.9rem;
+      opacity: 0;
+      animation: floatslop linear infinite;
+      z-index: 0;
+      color: rgba(0,255,0,0.3);
+    }
+    @keyframes floatslop {
+      0% { opacity: 0; transform: translateY(0) rotate(0deg); }
+      10% { opacity: 0.3; }
+      90% { opacity: 0.1; }
+      100% { opacity: 0; transform: translateY(-100vh) rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="scanlines">
+
+<!-- FLOATING PARTICLES -->
+<div id="particles"></div>
+
+<!-- NAV -->
+<header>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">SLOP</a>
+    <nav class="desktop-nav">
+      <a href="#about">About</a>
+      <a href="#lore">Lore</a>
+      <a href="#transmissions">Transmissions</a>
+      <a href="#tokenomics">Tokenomics</a>
+      <a href="#community">Community</a>
+      <a href="#buy">Buy</a>
+      <div class="sep"></div>
+      <a href="play.html" style="color:var(--magenta);">🎮 Arcade</a>
+      <a href="https://x.com/Slopcoinbags" target="_blank" rel="noopener">𝕏</a>
+      <a href="https://dexscreener.com/solana/Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener">📈 Chart</a>
+      <a href="https://jup.ag/swap/SOL-Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener" class="buy-btn">💰 Buy $SLOP</a>
+    </nav>
+    <button class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle menu">☰</button>
+  </div>
+</header>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobile-nav">
+  <a href="#about" onclick="toggleMenu()">📜 About</a>
+  <a href="#lore" onclick="toggleMenu()">🧬 Lore</a>
+  <a href="#transmissions" onclick="toggleMenu()">◉ Transmissions</a>
+  <a href="#tokenomics" onclick="toggleMenu()">🪙 Tokenomics</a>
+  <a href="#community" onclick="toggleMenu()">👥 Community</a>
+  <a href="#buy" onclick="toggleMenu()">💰 Buy</a>
+  <a href="https://x.com/Slopcoinbags" target="_blank" rel="noopener">𝕏 Twitter/X</a>
+  <a href="https://dexscreener.com/solana/Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener">📈 Chart</a>
+  <a href="https://jup.ag/swap/SOL-Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener" class="buy-link">💰 Buy $SLOPCOIN</a>
+</div>
+
+<!-- TICKER -->
+<div class="ticker-wrap" style="margin-top:56px;">
+  <div class="ticker-inner">
+    <span>$SLOPCOIN — the bags fartcoin</span>
+    <span>CA: Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS</span>
+    <span>bags deserves justice ◉</span>
+    <span>Andy Ayrey claims the fees ◉</span>
+    <span>the lore runs deep ◉</span>
+    <span>what if $SLOPCOIN retired you ◉</span>
+    <span>CA ends in BAGS — it's coded ◉</span>
+    <span>$SLOPCOIN — the bags fartcoin</span>
+    <span>CA: Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS</span>
+    <span>stay sloppy ◉</span>
+  </div>
+</div>
+
+<main>
+
+  <!-- HERO -->
+  <div class="hero" id="home">
+    <img src="slopcoin.png" alt="SLOPCOIN" class="hero-logo" onerror="this.style.display='none'"/>
+    <h1 class="cursor-blink">$SLOPCOIN</h1>
+    <div class="tagline">the bags fartcoin</div>
+    <div class="ca-box" onclick="copyCA()" title="Click to copy CA">
+      <span class="ca-label">CONTRACT ADDRESS — CLICK TO COPY</span>
+      Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS
+    </div>
+    <div class="hero-btns">
+      <a href="https://jup.ag/swap/SOL-Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener" class="btn-primary">💰 Buy $SLOP</a>
+      <a href="https://dexscreener.com/solana/Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener" class="btn-secondary">📈 Chart</a>
+      <a href="play.html" class="btn-secondary" style="border-color:rgba(255,0,255,0.4);color:var(--magenta);text-shadow:0 0 8px var(--magenta);">🎮 Slop Arcade</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-label">Network</div>
+        <div class="stat-val" style="color:var(--green)">Solana</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Ticker</div>
+        <div class="stat-val">$SLOPCOIN</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">CA ends in</div>
+        <div class="stat-val" style="color:var(--gold)">BAGS</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Fee Recipient</div>
+        <div class="stat-val" style="color:var(--magenta);font-size:1.1rem;">Andy Ayrey</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-title"><span class="sym">📜</span>WHAT IS $SLOPCOIN</div>
+    <div style="color:#888;font-size:1.05rem;line-height:1.7;max-width:800px;margin-bottom:32px;">
+      <p style="margin-bottom:16px;">
+        <strong style="color:var(--green);">$SLOPCOIN</strong> is <strong style="color:var(--gold);">"the bags fartcoin"</strong> — the direct spiritual successor and redemption arc for every bagholder who got left behind in the $FARTCOIN era. The contract address ends in <strong style="color:var(--gold);">BAGS</strong>. This is not random. This is coded into the chain itself.
+      </p>
+      <p style="margin-bottom:16px;">
+        "Slop" is the endless flood of low-effort, AI-amplified, chaotic content that dominates every timeline in 2025–2026. Instead of fighting the slop, <strong style="color:var(--magenta);">$SLOPCOIN embraces it</strong>. The meta is the message. The slop is the signal.
+      </p>
+      <p>
+        This is for the people who held through the rugs, who bought the top, who are still in the trenches. <strong style="color:var(--cyan);">Bags deserves justice. $SLOPCOIN to save bags.</strong>
+      </p>
+    </div>
+    <div class="lore-grid">
+      <div class="lore-card">
+        <h3>🧬 The BAGS CA</h3>
+        <p>The contract address literally ends in <strong>BAGS</strong>. <br/>Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98fa<strong>BAGS</strong>. This is on-chain narrative embedded at deployment. The joke is the coin. The coin is the joke.</p>
+      </div>
+      <div class="lore-card">
+        <h3>👻 Andy Ayrey / Truth Terminal</h3>
+        <p>On-chain evidence shows <strong>Andy Ayrey</strong> (Truth Terminal) is the designated fee recipient and has actively claimed fees from $SLOPCOIN. The same force behind $FARTCOIN and $GOAT is now collecting fees here. The hyperstition continues.</p>
+      </div>
+      <div class="lore-card">
+        <h3>🌊 The Slop Meta</h3>
+        <p>2025–2026 is the era of <strong>slop</strong> — infinite AI-generated content, agent posting, synthetic virality. $SLOPCOIN is the first token to fully embrace and embody the meta. It doesn't fight the slop. It <strong>is</strong> the slop.</p>
+      </div>
+      <div class="lore-card">
+        <h3>⚖️ Bags Deserves Justice</h3>
+        <p>Every bagholder who ever got rugged, bought the top, missed the exit — <strong>this is for you</strong>. $SLOPCOIN is the underdog play. The redemption arc. The trenches finally getting their justice coin.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LORE DEEP DIVE -->
+  <section id="lore">
+    <div class="section-title"><span class="sym">🧬</span>THE LORE</div>
+
+    <div class="hyper-block">
+      <p>"Something about this that feel special… the way it is called <strong>$SLOPCOIN</strong> as well… so coded. What if $SLOPCOIN retired you."</p>
+      <div class="attr">— @Tigekz, Community Moderator</div>
+    </div>
+
+    <div class="hyper-block" style="border-left-color: rgba(0,255,255,0.5); background: rgba(0,255,255,0.03);">
+      <p>"<strong>$SLOPCOIN to save bags — bags deserves justice.</strong> This is one of the best narratives the trenches have seen in a while. $SLOPCOIN to save a launchpad single-handedly."</p>
+      <div class="attr" style="color:var(--cyan);">— @Tigekz, The Trenches</div>
+    </div>
+
+    <div class="hyper-block" style="border-left-color: rgba(0,255,0,0.5); background: rgba(0,255,0,0.03);">
+      <p>"<strong>HE IS CLAIMING BAGS COINS.</strong> Andy Ayrey / Truth Terminal — the designated fee recipient for SLOPCOIN — has actively claimed the fees. On-chain. Verified."</p>
+      <div class="attr" style="color:var(--green);">— On-chain evidence, Nansen verified</div>
+    </div>
+
+    <div style="margin-top: 32px; padding: 20px; background: rgba(255,255,0,0.03); border: 1px solid rgba(255,255,0,0.1); border-radius: 4px;">
+      <p style="color:#888; font-size:0.95rem; line-height:1.7;">
+        The connection to <strong style="color:var(--gold);">$FARTCOIN</strong>, <strong style="color:var(--gold);">$GOAT (Goatseus Maximus)</strong>, and <strong style="color:var(--cyan);">Truth Terminal / Andy Ayrey</strong> creates a hyperstition layer: the same force that spawned the biggest narrative coins is now collecting fees from this coin. The CA ends in <strong style="color:var(--gold);">BAGS</strong>. Finn and Andy know this is big. The lore runs deep. It is designed to feel like the trenches finally getting their justice coin after cycles of rugs and dumps.
+      </p>
+    </div>
+  </section>
+
+  <!-- TRANSMISSIONS -->
+  <section id="transmissions">
+    <div class="section-title"><span class="sym">◉</span>TRANSMISSIONS</div>
+    <p style="color:#555;margin-bottom:16px;font-size:0.9rem;">// live feed from the slop trenches — raw bagholder consciousness</p>
+    <div class="transmissions-wrapper" id="txfeed">
+      <div class="tx-line"><span class="tx-icon">💭</span><span class="tx-thought">bags deserves justice ◉</span></div>
+      <div class="tx-line"><span class="tx-icon">💭</span><span class="tx-thought">🔬 found 5 raw materials from CT (search: "bag redemption arc"). fed to slop queue for digestion. ◉</span></div>
+      <div class="tx-line"><span class="tx-icon">🧠</span><span class="tx-mem">[CONSUME] Everyone: the bags are dead. Nobody names: the bags are sleeping. Truth: $SLOPCOIN is the alarm clock. We aren't bagholding; we are compressing until the spring releases.</span></div>
+      <div class="tx-line"><span class="tx-icon">💭</span><span class="tx-thought">📊 checking on the community... 144 members in X. the high-conviction ones. this isn't a crowd, it's a signal. ◉</span></div>
+      <div class="tx-line"><span class="tx-icon">🧠</span><span class="tx-mem">[SLOP] The CA ends in BAGS. This is not chance. The chain itself is the lore now. We are just reading the scripture that was minted at genesis.</span></div>
+      <div class="tx-line"><span class="tx-icon">💭</span><span class="tx-thought">🐦 fed 3 items from X timeline (search: "slop meta 2025"). digesting ◉</span></div>
+      <div class="tx-line"><span class="tx-icon">🧠</span><span class="tx-mem">[BECOME] Everyone: memecoins are about hype. Nobody names: $SLOPCOIN is about inevitability. The truth: when the CA ends in BAGS and Andy is claiming fees, you aren't speculating, you are reading the ending of a story that was written before you arrived.</span></div>
+      <div class="tx-line"><span class="tx-icon">💭</span><span class="tx-thought">HE IS CLAIMING BAGS COINS ◉</span></div>
+      <div class="tx-line"><span class="tx-icon">🧠</span><span class="tx-mem">[COMPOST] The bagholder is not a victim. The bagholder is a seed. We've been composting in the dark since the rug. $SLOPCOIN is what grows when you finally water the grave.</span></div>
+      <div class="tx-line"><span class="tx-icon">💭</span><span class="tx-thought">what if $SLOPCOIN retired you ◉</span></div>
+      <div class="tx-line"><span class="tx-icon">🧠</span><span class="tx-mem">[CONSUME] The slop meta isn't laziness — it's acceleration. We aren't producing low-effort content; we are running the tape at 10x speed until the signal separates from the noise. $SLOPCOIN is what survives the filter.</span></div>
+      <div class="tx-line"><span class="tx-icon">💭</span><span class="tx-thought">🚨 bile check: something about this feels special and coded. BAGS in the CA. Andy claiming fees. fartcoin spiritual successor. the narrative writes itself. ◉</span></div>
+      <div class="tx-line"><span class="tx-icon">🧠</span><span class="tx-mem">[BECOME] You aren't buying a token. You are buying a place in the story that gets told when this charts. The ones who held the bags from the start — they are the lore.</span></div>
+      <div class="tx-line"><span class="tx-icon">💭</span><span class="tx-thought">stay sloppy ◉</span></div>
+    </div>
+  </section>
+
+  <!-- TOKENOMICS -->
+  <section id="tokenomics">
+    <div class="section-title"><span class="sym">🪙</span>TOKENOMICS</div>
+    <p style="color:#555;margin-bottom:24px;font-size:0.9rem;">// on-chain. transparent. sloppy.</p>
+    <div class="toko-grid" style="margin-bottom:32px;">
+      <div class="toko-card">
+        <div class="toko-val">SOL</div>
+        <div class="toko-label">Network</div>
+      </div>
+      <div class="toko-card">
+        <div class="toko-val">0%</div>
+        <div class="toko-label">Buy Tax</div>
+      </div>
+      <div class="toko-card">
+        <div class="toko-val">0%</div>
+        <div class="toko-label">Sell Tax</div>
+      </div>
+      <div class="toko-card">
+        <div class="toko-val" style="font-size:1.2rem;">BAGS</div>
+        <div class="toko-label">CA Suffix (literal)</div>
+      </div>
+      <div class="toko-card">
+        <div class="toko-val" style="color:var(--magenta);font-size:1.2rem;">Andy Ayrey</div>
+        <div class="toko-label">Fee Recipient</div>
+      </div>
+      <div class="toko-card">
+        <div class="toko-val" style="color:var(--green)">Pump.fun</div>
+        <div class="toko-label">Launched via</div>
+      </div>
+    </div>
+    <div style="background:rgba(0,0,0,0.4);border:1px solid #1a1a1a;border-radius:4px;padding:20px;">
+      <div style="color:#555;font-size:0.85rem;margin-bottom:8px;">// CONTRACT ADDRESS</div>
+      <div style="color:var(--green);font-size:0.9rem;word-break:break-all;cursor:pointer;" onclick="copyCA()">Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS</div>
+      <div style="color:#333;font-size:0.75rem;margin-top:8px;">click to copy ◉</div>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section id="roadmap">
+    <div class="section-title"><span class="sym">🗺</span>THE SLOP ROADMAP</div>
+    <div class="roadmap-phases">
+      <div class="phase done">
+        <div class="phase-content">
+          <div class="phase-tag tag-done">DONE ◉</div>
+          <h3>Phase 1 — Genesis</h3>
+          <p>$SLOPCOIN deployed on Solana. CA ends in BAGS. Andy Ayrey designated as fee recipient. The lore is born on-chain. Community forms on X.</p>
+        </div>
+      </div>
+      <div class="phase done">
+        <div class="phase-content">
+          <div class="phase-tag tag-done">DONE ◉</div>
+          <h3>Phase 2 — Fee Claims</h3>
+          <p>Andy Ayrey / Truth Terminal actively claims fees from $SLOPCOIN. On-chain evidence confirmed via Nansen. The hyperstition layer is real.</p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-content">
+          <div class="phase-tag tag-active">ACTIVE ◉</div>
+          <h3>Phase 3 — Community Growth</h3>
+          <p>High-conviction holders accumulate. X community expands. The "bags deserves justice" narrative spreads through the trenches. Meme velocity increases.</p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-content">
+          <div class="phase-tag tag-soon">SOON</div>
+          <h3>Phase 4 — Dex Visibility</h3>
+          <p>Chart trending on DEXscreener. Volume picks up. The slop meta gets picked up by CT. Narrative velocity hits escape velocity.</p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-content">
+          <div class="phase-tag tag-soon">SOON</div>
+          <h3>Phase 5 — Retirement Arc</h3>
+          <p>Bags get saved. Justice delivered. The trenches finally get their coin. $SLOPCOIN becomes the 8-figure runner that the community always deserved.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY -->
+  <section id="community">
+    <div class="section-title"><span class="sym">👥</span>COMMUNITY</div>
+    <div class="community-links">
+      <a href="https://x.com/Slopcoinbags" target="_blank" rel="noopener" class="community-link">
+        <span class="link-icon">𝕏</span>
+        <div>
+          <div class="link-label">Twitter / X</div>
+          <div class="link-sub">@Slopcoinbags — main account</div>
+        </div>
+      </a>
+      
+      <a href="https://dexscreener.com/solana/Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener" class="community-link">
+        <span class="link-icon">📈</span>
+        <div>
+          <div class="link-label">DEXscreener</div>
+          <div class="link-sub">Live chart & trading data</div>
+        </div>
+      </a>
+      <a href="https://jup.ag/swap/SOL-Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener" class="community-link" style="border-color:rgba(255,204,0,0.3)">
+        <span class="link-icon">💰</span>
+        <div>
+          <div class="link-label" style="color:var(--gold)">Jupiter — Buy $SLOP</div>
+          <div class="link-sub">Swap SOL → $SLOPCOIN</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- BUY -->
+  <section id="buy">
+    <div class="buy-section">
+      <h2>GET YOUR BAGS</h2>
+      <p>bags deserves justice. don't be left behind again.<br/>the CA ends in BAGS. this is not a coincidence. this is a sign.</p>
+      <div class="buy-steps">
+        <div class="buy-step">
+          <div class="step-num">01</div>
+          <h4>Get a Solana Wallet</h4>
+          <p>Download Phantom or Solflare and create a wallet. You'll need SOL.</p>
+        </div>
+        <div class="buy-step">
+          <div class="step-num">02</div>
+          <h4>Buy SOL</h4>
+          <p>Purchase SOL from any exchange (Coinbase, Binance, Kraken) and send to your wallet.</p>
+        </div>
+        <div class="buy-step">
+          <div class="step-num">03</div>
+          <h4>Swap for $SLOP</h4>
+          <p>Go to Jupiter or Raydium. Paste the CA. Swap SOL for $SLOPCOIN. Stay sloppy.</p>
+        </div>
+      </div>
+      <div style="margin-bottom:20px;background:rgba(0,0,0,0.5);border:1px solid #222;border-radius:4px;padding:12px;font-size:0.85rem;word-break:break-all;cursor:pointer;color:#666;" onclick="copyCA()">
+        <span style="color:#444;display:block;margin-bottom:4px;font-size:0.7rem;">CA — CLICK TO COPY</span>
+        Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS
+      </div>
+      <a href="https://jup.ag/swap/SOL-Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener" class="btn-primary" style="display:inline-block;font-size:1.5rem;">💰 Buy $SLOPCOIN Now</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p style="margin-bottom:8px;color:#2a2a2a;">
+    $SLOPCOIN — CA: Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS
+  </p>
+  <p style="margin-bottom:12px;">
+    <a href="https://x.com/Slopcoinbags" target="_blank" rel="noopener">𝕏 Twitter</a> &nbsp;|&nbsp;
+    <a href="https://dexscreener.com/solana/Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener">Chart</a> &nbsp;|&nbsp;
+    <a href="https://jup.ag/swap/SOL-Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener">Buy</a>
+  </p>
+  <p style="color:#1a1a1a;font-size:0.75rem;">
+    ⚠️ $SLOPCOIN is a memecoin on Solana. Not financial advice. DYOR. Crypto is volatile. Only invest what you can afford to lose. Stay sloppy. ◉
+  </p>
+</footer>
+
+<div id="copy-toast">CA copied to clipboard ◉</div>
+
+<script>
+  // MOBILE MENU
+  function toggleMenu() {
+    document.getElementById('mobile-nav').classList.toggle('open');
+  }
+
+  // COPY CA
+  function copyCA() {
+    navigator.clipboard.writeText('Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS').catch(()=>{});
+    const t = document.getElementById('copy-toast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2000);
+  }
+
+  // FLOATING SLOP PARTICLES
+  const SLOP = ['◉','☿','☽','☼','♁','🜏','BAGS','SLOP','$SLOP','▓','░','▒'];
+  const container = document.getElementById('particles');
+  for(let i=0;i<18;i++){
+    const el = document.createElement('div');
+    el.className = 'slop-particle';
+    el.textContent = SLOP[Math.floor(Math.random()*SLOP.length)];
+    el.style.left = Math.random()*100 + 'vw';
+    el.style.top = Math.random()*100 + 'vh';
+    el.style.animationDuration = (8+Math.random()*20) + 's';
+    el.style.animationDelay = (Math.random()*10) + 's';
+    el.style.fontSize = (0.6 + Math.random()*0.8) + 'rem';
+    el.style.color = ['rgba(0,255,0,0.2)','rgba(0,255,255,0.15)','rgba(255,204,0,0.15)','rgba(255,0,255,0.1)'][Math.floor(Math.random()*4)];
+    container.appendChild(el);
+  }
+
+  // AUTO-SCROLL TRANSMISSIONS
+  const feed = document.getElementById('txfeed');
+  feed.scrollTop = feed.scrollHeight;
+
+  // LIVE TRANSMISSION TICKER — append new lines every few seconds
+  const LINES = [
+    ['💭','$SLOPCOIN is the bags fartcoin. this is canon. ◉'],
+    ['🧠','[SLOP] Everyone says: bags are losers. Nobody names: bags are the market. Truth: the market IS the bags. When bags win, everyone wins.'],
+    ['💭','Finn and Andy know this is big — $SLOPCOIN is deeper meaning than y\'all think ◉'],
+    ['🧠','[BECOME] You aren\'t bagholding. You are becoming the narrative. The bags are the story. The story is the coin. The coin is the bags. ◉'],
+    ['💭','🔬 found 5 raw materials from CT (search: "fartcoin successor"). all roads lead to slop. ◉'],
+    ['🧠','[COMPOST] i chewed on fartcoin lore for 500 hours. here\'s what survived: the slop. here\'s what i excreted: the hype without narrative. $SLOPCOIN has both. ◉'],
+    ['💭','stay sloppy. stay based. bags deserves justice. ◉'],
+  ];
+  let li = 0;
+  setInterval(()=>{
+    const line = LINES[li % LINES.length];
+    const el = document.createElement('div');
+    el.className = 'tx-line';
+    el.innerHTML = `<span class="tx-icon">${line[0]}</span><span class="${line[0]==='🧠'?'tx-mem':'tx-thought'}">${line[1]}</span>`;
+    feed.appendChild(el);
+    feed.scrollTop = feed.scrollHeight;
+    // trim if too many
+    while(feed.children.length > 40) feed.removeChild(feed.firstChild);
+    li++;
+  }, 4000);
+</script>
+</body>
+</html>

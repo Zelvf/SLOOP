@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>$SLOPCOIN — THE SLOP ARCADE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --green: #00ff00;
+      --cyan: #00ffff;
+      --magenta: #ff00ff;
+      --gold: #ffcc00;
+      --amber: #f99c00;
+      --purple: #c07eff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--bg);
+      color: var(--green);
+      font-family: 'VT323', monospace;
+      font-size: 18px;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* SCANLINES */
+    .scanlines::before {
+      content: "";
+      pointer-events: none;
+      z-index: 900;
+      background: repeating-linear-gradient(0deg, rgba(0,0,0,0.12) 0px, rgba(0,0,0,0.12) 1px, transparent 1px, transparent 2px);
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0; left: 0;
+    }
+
+    @keyframes blink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
+    .blink { animation: blink 1s infinite; }
+
+    /* NAV */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      background: rgba(0,0,0,0.92); backdrop-filter: blur(8px);
+      border-bottom: 1px solid #00ff0022;
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+      display: flex; align-items: center; justify-content: space-between; height: 52px;
+    }
+    .nav-logo { font-size: 1.4rem; color: var(--cyan); text-shadow: 0 0 10px var(--cyan); text-decoration: none; letter-spacing: 0.2em; }
+    .nav-back { color: #666; text-decoration: none; font-size: 1rem; transition: color 0.15s; }
+    .nav-back:hover { color: var(--gold); }
+    .nav-title { color: var(--gold); font-size: 1.1rem; letter-spacing: 0.15em; text-shadow: 0 0 8px var(--gold); }
+
+    /* PAGE HEADER */
+    .page-header {
+      padding: 80px 1rem 32px;
+      text-align: center;
+    }
+    .page-header h1 { font-size: clamp(2.5rem, 8vw, 5rem); color: var(--gold); text-shadow: 0 0 20px var(--gold); letter-spacing: 0.2em; margin-bottom: 8px; }
+    .page-header p { color: #666; font-size: 1.1rem; }
+
+    /* ARCADE GRID */
+    .arcade-grid {
+      max-width: 1100px; margin: 0 auto; padding: 0 1rem 80px;
+      display: grid; grid-template-columns: 1fr; gap: 32px;
+    }
+    @media(min-width: 768px) { .arcade-grid { grid-template-columns: 1fr 1fr; } }
+
+    /* GAME CARD */
+    .game-card {
+      background: rgba(0,0,0,0.6);
+      border: 1px solid #222;
+      border-radius: 4px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .game-card:hover { border-color: rgba(255,204,0,0.3); }
+    .game-card.full-width { grid-column: 1 / -1; }
+
+    .game-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #111;
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.02);
+    }
+    .game-header .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f56; }
+    .dot-y { background: #ffbd2e; }
+    .dot-g { background: #27c93f; }
+    .game-title { color: var(--cyan); font-size: 1rem; letter-spacing: 0.1em; margin-left: 4px; flex: 1; }
+    .game-score-display { color: var(--gold); font-size: 0.9rem; }
+
+    .game-body { padding: 16px; }
+
+    /* ========================
+       GAME 1: BAGS OR RUGGED
+       ======================== */
+    #bags-game { text-align: center; }
+    .bags-question {
+      font-size: 1.4rem; color: #aaa; margin-bottom: 16px; min-height: 60px; line-height: 1.4;
+    }
+    .bags-emoji { font-size: 4rem; margin: 12px 0; display: block; }
+    .bags-choices { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+    .bags-btn {
+      background: none; border: 1px solid #333; color: #aaa;
+      padding: 8px 24px; font-family: 'VT323', monospace; font-size: 1.3rem;
+      cursor: pointer; border-radius: 3px; transition: all 0.15s; letter-spacing: 0.05em;
+    }
+    .bags-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .bags-btn.correct { border-color: var(--green); color: var(--green); background: rgba(0,255,0,0.1); }
+    .bags-btn.wrong { border-color: #ff3333; color: #ff3333; background: rgba(255,0,0,0.1); }
+    .bags-feedback { font-size: 1.1rem; margin-top: 12px; min-height: 28px; }
+
+    /* ========================
+       GAME 2: SLOP CLICKER
+       ======================== */
+    #clicker-game { text-align: center; }
+    .clicker-area {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+    }
+    #slop-btn {
+      width: 120px; height: 120px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,204,0,0.15), rgba(0,0,0,0.8));
+      border: 2px solid rgba(255,204,0,0.4);
+      font-size: 3.5rem; cursor: pointer;
+      transition: transform 0.08s, box-shadow 0.08s;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 20px rgba(255,204,0,0.15);
+    }
+    #slop-btn:active { transform: scale(0.9); box-shadow: 0 0 40px rgba(255,204,0,0.4); }
+    .clicker-stats { display: flex; gap: 24px; margin-top: 8px; }
+    .c-stat { text-align: center; }
+    .c-stat-val { color: var(--gold); font-size: 1.8rem; text-shadow: 0 0 8px var(--gold); }
+    .c-stat-label { color: #444; font-size: 0.75rem; text-transform: uppercase; }
+    .clicker-upgrades { width: 100%; margin-top: 16px; border-top: 1px solid #1a1a1a; padding-top: 12px; }
+    .upgrade-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 4px; border-bottom: 1px solid #111;
+    }
+    .upg-info { text-align: left; }
+    .upg-name { color: #aaa; font-size: 0.95rem; }
+    .upg-desc { color: #444; font-size: 0.75rem; }
+    .upg-btn {
+      background: none; border: 1px solid #333; color: #666;
+      padding: 4px 12px; font-family: 'VT323', monospace; font-size: 0.9rem;
+      cursor: pointer; border-radius: 3px; transition: all 0.15s; white-space: nowrap;
+    }
+    .upg-btn:not(:disabled):hover { border-color: var(--gold); color: var(--gold); }
+    .upg-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .upg-btn.owned { border-color: var(--green); color: var(--green); }
+    #click-floats { position: relative; height: 0; overflow: visible; pointer-events: none; }
+
+    /* ========================
+       GAME 3: SLOP TYPER
+       ======================== */
+    #typer-game { }
+    .typer-prompt {
+      background: rgba(0,0,0,0.5); border: 1px solid #1a1a1a; border-radius: 3px;
+      padding: 12px 16px; margin-bottom: 12px; font-size: 1.1rem;
+      color: #888; line-height: 1.5; min-height: 56px;
+    }
+    .typer-prompt .highlight { color: var(--gold); }
+    .typer-input {
+      width: 100%; background: rgba(0,255,0,0.04); border: 1px solid rgba(0,255,0,0.2);
+      color: var(--green); font-family: 'VT323', monospace; font-size: 1.2rem;
+      padding: 10px 14px; border-radius: 3px; outline: none; transition: border-color 0.15s;
+    }
+    .typer-input:focus { border-color: rgba(0,255,0,0.5); }
+    .typer-stats { display: flex; gap: 20px; margin-top: 12px; flex-wrap: wrap; }
+    .t-stat { color: #555; font-size: 0.85rem; }
+    .t-stat span { color: var(--cyan); }
+    .typer-result { margin-top: 8px; font-size: 1.1rem; min-height: 24px; }
+
+    /* ========================
+       GAME 4: SLOP SURVIVAL
+       ======================== */
+    #survival-game { }
+    #survival-canvas {
+      width: 100%; height: 260px; background: #000;
+      border: 1px solid #1a1a1a; border-radius: 3px; display: block;
+      cursor: none;
+    }
+    .survival-ui { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; flex-wrap: wrap; gap: 8px; }
+    .survival-info { color: #555; font-size: 0.85rem; }
+    .survival-info span { color: var(--cyan); }
+    #survival-start {
+      background: none; border: 1px solid rgba(255,204,0,0.4); color: var(--gold);
+      padding: 6px 20px; font-family: 'VT323', monospace; font-size: 1.1rem;
+      cursor: pointer; border-radius: 3px; transition: all 0.15s;
+    }
+    #survival-start:hover { background: rgba(255,204,0,0.1); }
+
+    /* ========================
+       GAME 5: BAG SORTER
+       ======================== */
+    #sorter-game { text-align: center; }
+    .sorter-desc { color: #666; font-size: 0.9rem; margin-bottom: 16px; }
+    .sorter-word {
+      font-size: 2.5rem; color: var(--gold); text-shadow: 0 0 10px var(--gold);
+      letter-spacing: 0.1em; min-height: 56px; margin-bottom: 8px;
+      transition: opacity 0.15s;
+    }
+    .sorter-category { color: #555; font-size: 0.85rem; margin-bottom: 20px; }
+    .sorter-choices { display: flex; gap: 12px; justify-content: center; }
+    .sorter-btn {
+      flex: 1; max-width: 160px; padding: 12px 8px;
+      border-radius: 3px; font-family: 'VT323', monospace; font-size: 1.2rem;
+      cursor: pointer; transition: all 0.15s; border: 1px solid #333;
+      background: rgba(0,0,0,0.5); color: #aaa;
+    }
+    .sorter-btn:hover { transform: scale(1.04); }
+    #sorter-slop:hover { border-color: var(--gold); color: var(--gold); background: rgba(255,204,0,0.08); }
+    #sorter-rug:hover { border-color: #ff3333; color: #ff3333; background: rgba(255,0,0,0.08); }
+    .sorter-streak { color: var(--magenta); font-size: 1rem; min-height: 24px; margin-top: 8px; }
+
+    /* ========================
+       GAME 6: BAG QUIZ
+       ======================== */
+    #quiz-game { }
+    .quiz-q { font-size: 1.1rem; color: #aaa; margin-bottom: 16px; min-height: 52px; line-height: 1.5; }
+    .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+    .quiz-opt {
+      background: none; border: 1px solid #222; color: #777;
+      padding: 8px 14px; font-family: 'VT323', monospace; font-size: 1rem;
+      text-align: left; cursor: pointer; border-radius: 3px; transition: all 0.15s;
+    }
+    .quiz-opt:hover:not(:disabled) { border-color: rgba(255,204,0,0.4); color: var(--gold); }
+    .quiz-opt.correct { border-color: var(--green); color: var(--green); background: rgba(0,255,0,0.08); }
+    .quiz-opt.wrong { border-color: #ff3333; color: #ff3333; background: rgba(255,0,0,0.08); }
+    .quiz-feedback { font-size: 1rem; margin-top: 12px; min-height: 48px; color: #aaa; line-height: 1.4; }
+    .quiz-next {
+      background: none; border: 1px solid rgba(255,204,0,0.3); color: var(--gold);
+      padding: 6px 20px; font-family: 'VT323', monospace; font-size: 1.1rem;
+      cursor: pointer; border-radius: 3px; margin-top: 10px; transition: all 0.15s;
+      display: none;
+    }
+    .quiz-next:hover { background: rgba(255,204,0,0.1); }
+
+    /* FOOTER */
+    footer { text-align: center; padding: 24px; color: #1a1a1a; font-size: 0.8rem; border-top: 1px solid #0d0d0d; }
+    footer a { color: #2a2a2a; text-decoration: none; }
+    footer a:hover { color: var(--gold); }
+
+    /* FLOAT ANIM for clicker */
+    @keyframes floatUp { 0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-80px)} }
+    .float-num { position: absolute; pointer-events: none; font-size: 1.2rem; animation: floatUp 0.8s ease-out forwards; }
+
+    /* TICKER */
+    @keyframes ticker { from{transform:translateX(100vw)} to{transform:translateX(-100%)} }
+    .ticker-wrap { overflow: hidden; border-bottom: 1px solid #0d0d0d; background: #000; padding: 5px 0; }
+    .ticker-inner { display: inline-block; white-space: nowrap; animation: ticker 35s linear infinite; }
+    .ticker-inner span { color: #333; margin-right: 60px; font-size: 0.85rem; }
+  </style>
+</head>
+<body class="scanlines">
+
+<header>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-back">← back to $SLOPCOIN</a>
+    <span class="nav-title">THE SLOP ARCADE <span class="blink">█</span></span>
+    <a href="index.html" class="nav-logo">SLOP</a>
+  </div>
+</header>
+
+<div class="ticker-wrap" style="margin-top:52px;">
+  <div class="ticker-inner">
+    <span>THE SLOP ARCADE — play to prove bags deserves justice</span>
+    <span>◉ every click is a vote for the redemption arc</span>
+    <span>◉ stay sloppy, play sloppy</span>
+    <span>◉ bags deserves justice</span>
+    <span>◉ the CA ends in BAGS — coincidence? NO</span>
+    <span>◉ THE SLOP ARCADE</span>
+  </div>
+</div>
+
+<div class="page-header">
+  <h1>🎮 SLOP ARCADE</h1>
+  <p style="color:#555;">// interactive experiences for the bagholder who has nothing left to lose</p>
+</div>
+
+<div class="arcade-grid">
+
+  <!-- ============================
+       GAME 1: BAGS OR RUGGED
+       ============================ -->
+  <div class="game-card">
+    <div class="game-header">
+      <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+      <span class="game-title">BAGS OR RUGGED?</span>
+      <span class="game-score-display" id="bor-score-disp">0 / 0</span>
+    </div>
+    <div class="game-body">
+      <div id="bags-game">
+        <p style="color:#555;font-size:0.85rem;margin-bottom:12px;">// is this memecoin narrative a real bag or a rug in disguise?</p>
+        <div class="bags-question" id="bor-q">Loading the trenches...</div>
+        <span class="bags-emoji" id="bor-emoji">🤔</span>
+        <div class="bags-choices">
+          <button class="bags-btn" id="bor-bags" onclick="borAnswer('bags')">💰 BAGS</button>
+          <button class="bags-btn" id="bor-rug" onclick="borAnswer('rug')">🪤 RUGGED</button>
+        </div>
+        <div class="bags-feedback" id="bor-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       GAME 2: SLOP CLICKER
+       ============================ -->
+  <div class="game-card">
+    <div class="game-header">
+      <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+      <span class="game-title">SLOP CLICKER</span>
+      <span class="game-score-display" id="click-per-sec">0 SPS</span>
+    </div>
+    <div class="game-body">
+      <div id="clicker-game">
+        <p style="color:#555;font-size:0.85rem;margin-bottom:12px;">// click to accumulate slop. upgrade to automate the bags. ◉</p>
+        <div class="clicker-area">
+          <div style="position:relative;">
+            <button id="slop-btn" onclick="clickSlop(event)">🛍️</button>
+            <div id="click-floats"></div>
+          </div>
+          <div class="clicker-stats">
+            <div class="c-stat">
+              <div class="c-stat-val" id="slop-count">0</div>
+              <div class="c-stat-label">Total Slop</div>
+            </div>
+            <div class="c-stat">
+              <div class="c-stat-val" id="slop-rate">0</div>
+              <div class="c-stat-label">Slop/Sec</div>
+            </div>
+            <div class="c-stat">
+              <div class="c-stat-val" id="slop-click-power">1</div>
+              <div class="c-stat-label">Click Power</div>
+            </div>
+          </div>
+          <div class="clicker-upgrades" id="upgrades-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       GAME 3: SLOP TYPER
+       ============================ -->
+  <div class="game-card">
+    <div class="game-header">
+      <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+      <span class="game-title">SLOP TYPER — TYPE THE LORE</span>
+      <span class="game-score-display" id="typer-wpm-disp">-- WPM</span>
+    </div>
+    <div class="game-body">
+      <div id="typer-game">
+        <p style="color:#555;font-size:0.85rem;margin-bottom:10px;">// type the phrase as fast as you can. bags deserves speed. ◉</p>
+        <div class="typer-prompt" id="typer-prompt">Loading slop phrase...</div>
+        <input class="typer-input" id="typer-input" placeholder="start typing..." autocomplete="off" spellcheck="false"/>
+        <div class="typer-stats">
+          <div class="t-stat">WPM: <span id="t-wpm">--</span></div>
+          <div class="t-stat">Accuracy: <span id="t-acc">--</span></div>
+          <div class="t-stat">Time: <span id="t-time">--</span>s</div>
+          <div class="t-stat">Best WPM: <span id="t-best">--</span></div>
+        </div>
+        <div class="typer-result" id="typer-result"></div>
+        <button onclick="newTyperRound()" style="margin-top:10px;background:none;border:1px solid #222;color:#555;padding:4px 14px;font-family:'VT323',monospace;font-size:0.9rem;cursor:pointer;border-radius:3px;transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(255,204,0,0.3)';this.style.color='#ffcc00'" onmouseout="this.style.borderColor='#222';this.style.color='#555'">↺ new phrase</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       GAME 4: SLOP SURVIVAL
+       ============================ -->
+  <div class="game-card">
+    <div class="game-header">
+      <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+      <span class="game-title">SLOP SURVIVAL — DODGE THE RUGS</span>
+      <span class="game-score-display" id="surv-score-disp">0</span>
+    </div>
+    <div class="game-body">
+      <div id="survival-game">
+        <p style="color:#555;font-size:0.85rem;margin-bottom:8px;">// move mouse / drag finger to collect BAGS 💰 — dodge RUGS 🪤</p>
+        <canvas id="survival-canvas"></canvas>
+        <div class="survival-ui">
+          <div class="survival-info">Lives: <span id="surv-lives">❤️❤️❤️</span></div>
+          <div class="survival-info">Score: <span id="surv-score">0</span></div>
+          <div class="survival-info">Best: <span id="surv-best">0</span></div>
+          <button id="survival-start" onclick="startSurvival()">▶ START</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       GAME 5: SLOP SORTER
+       ============================ -->
+  <div class="game-card">
+    <div class="game-header">
+      <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+      <span class="game-title">SLOP OR RUG — WORD SORTER</span>
+      <span class="game-score-display" id="sorter-score-disp">0</span>
+    </div>
+    <div class="game-body">
+      <div id="sorter-game">
+        <p class="sorter-desc">// split-second decision: does this word belong in the $SLOPCOIN universe or is it a rug?</p>
+        <div class="sorter-word" id="sorter-word">READY?</div>
+        <div class="sorter-category" id="sorter-cat">press start to begin</div>
+        <div class="sorter-choices">
+          <button class="sorter-btn" id="sorter-slop" onclick="sorterAnswer('slop')">💰 SLOP VIBES</button>
+          <button class="sorter-btn" id="sorter-rug" onclick="sorterAnswer('rug')">🪤 RUG ENERGY</button>
+        </div>
+        <div class="sorter-streak" id="sorter-streak"></div>
+        <button onclick="startSorter()" style="margin-top:12px;background:none;border:1px solid rgba(255,204,0,0.3);color:var(--gold);padding:6px 20px;font-family:'VT323',monospace;font-size:1.1rem;cursor:pointer;border-radius:3px;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,204,0,0.1)'" onmouseout="this.style.background='none'">▶ START SORTER</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+       GAME 6: LORE QUIZ
+       ============================ -->
+  <div class="game-card">
+    <div class="game-header">
+      <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+      <span class="game-title">SLOPCOIN LORE QUIZ</span>
+      <span class="game-score-display" id="quiz-score-disp">0 pts</span>
+    </div>
+    <div class="game-body">
+      <div id="quiz-game">
+        <p style="color:#555;font-size:0.85rem;margin-bottom:12px;">// how deep is your lore knowledge? prove you've been in the trenches. ◉</p>
+        <div class="quiz-q" id="quiz-q">Press "Next Question" to begin the lore quiz ◉</div>
+        <div class="quiz-options" id="quiz-opts"></div>
+        <div class="quiz-feedback" id="quiz-feedback"></div>
+        <button class="quiz-next" id="quiz-next-btn" onclick="nextQuiz()">Next Question ▶</button>
+        <button onclick="nextQuiz()" id="quiz-start-btn" style="background:none;border:1px solid rgba(255,204,0,0.3);color:var(--gold);padding:6px 20px;font-family:'VT323',monospace;font-size:1.1rem;cursor:pointer;border-radius:3px;margin-top:10px;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,204,0,0.1)'" onmouseout="this.style.background='none'">▶ START QUIZ</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end arcade-grid -->
+
+<footer>
+  <p><a href="index.html">← back to $SLOPCOIN</a> &nbsp;|&nbsp; <a href="https://x.com/Slopcoinbags" target="_blank">𝕏 @Slopcoinbags</a></p>
+  <p style="margin-top:8px;">CA: Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS &nbsp;|&nbsp; stay sloppy ◉</p>
+</footer>
+
+<script>
+// ==========================================
+// GAME 1: BAGS OR RUGGED?
+// ==========================================
+const BOR_ROUNDS = [
+  { q:"A coin's CA literally ends in 'BAGS' on-chain and the fee recipient is a legendary AI narrative agent.", emoji:"🛍️", answer:"bags", right:"Coded into the chain itself. This is not random. This is lore.", wrong:"Bro. The CA ends in BAGS. Andy is claiming fees. Wake up." },
+  { q:"Dev announces 'surprise 10x token supply expansion' 3 days after launch.", emoji:"🚨", answer:"rug", right:"Classic dilution rug. More supply = your bags shrink. Run.", wrong:"Nah fam. Supply expansion mid-launch = instant rug energy." },
+  { q:"Andy Ayrey (Truth Terminal) is actively claiming fees on-chain from this token.", emoji:"👻", answer:"bags", right:"Same force behind GOAT and FARTCOIN. This is the hyperstition layer.", wrong:"You just called the Truth Terminal a rug? Skill issue." },
+  { q:"Liquidity pool locked for 2 years, verified on-chain. Team holds 0%.", emoji:"🔒", answer:"bags", right:"LP lock + no team allocation = safu by the numbers.", wrong:"Locked LP and 0% team = green flags. You failed the vibe check." },
+  { q:"Token called 'TRUSTMEBRO' launches with anonymous dev, no audit, 80% team allocation.", emoji:"🤡", answer:"rug", right:"80% team allocation + anon dev + unaudited = textbook rug.", wrong:"TRUSTMEBRO with 80% team tokens? That's a rug in a trenchcoat." },
+  { q:"The coin's entire narrative is 'we are the coin for bagholders who got rugged before. bags deserves justice.'", emoji:"⚖️", answer:"bags", right:"Redemption arc narrative is the most powerful in memecoin lore. This is $SLOPCOIN.", wrong:"A justice coin for bagholders is peak bags energy. Rethink." },
+  { q:"Dev wallet dumps 40% of supply 6 hours after launch during a pump.", emoji:"📉", answer:"rug", right:"Dev dump on the community during a pump = classic exit. RIP bags.", wrong:"40% dump 6 hours in... that's a rug. Trust your gut." },
+  { q:"Token has been trading for 3 weeks, chart is steady, community posts daily, fees claimed by well-known name.", emoji:"📈", answer:"bags", right:"Sustained activity + named fee claimer + active community = real bags.", wrong:"Weeks of trading with active community and named participants = legit." },
+];
+let borIdx = 0, borScore = 0, borTotal = 0, borAnswered = false;
+
+function borLoad() {
+  borAnswered = false;
+  const r = BOR_ROUNDS[borIdx % BOR_ROUNDS.length];
+  document.getElementById('bor-q').textContent = r.q;
+  document.getElementById('bor-emoji').textContent = r.emoji;
+  document.getElementById('bor-feedback').textContent = '';
+  document.getElementById('bor-feedback').style.color = '';
+  document.getElementById('bor-bags').className = 'bags-btn';
+  document.getElementById('bor-rug').className = 'bags-btn';
+}
+
+function borAnswer(choice) {
+  if(borAnswered) return;
+  borAnswered = true;
+  borTotal++;
+  const r = BOR_ROUNDS[borIdx % BOR_ROUNDS.length];
+  const correct = choice === r.answer;
+  if(correct) {
+    borScore++;
+    document.getElementById('bor-feedback').textContent = '✅ ' + r.right;
+    document.getElementById('bor-feedback').style.color = '#00ff00';
+    document.getElementById('bor-' + choice).classList.add('correct');
+  } else {
+    document.getElementById('bor-feedback').textContent = '❌ ' + r.wrong;
+    document.getElementById('bor-feedback').style.color = '#ff3333';
+    document.getElementById('bor-' + choice).classList.add('wrong');
+    document.getElementById('bor-' + r.answer).classList.add('correct');
+  }
+  document.getElementById('bor-score-disp').textContent = borScore + ' / ' + borTotal;
+  borIdx++;
+  setTimeout(borLoad, 2000);
+}
+borLoad();
+
+
+// ==========================================
+// GAME 2: SLOP CLICKER
+// ==========================================
+let slopCount = 0, slopRate = 0, clickPower = 1;
+const UPGRADES = [
+  { id:'u1', name:'Bag Multiplier', desc:'+2 click power', cost:50, cps:0, cp:2, owned:false },
+  { id:'u2', name:'Auto-Slop Bot', desc:'+1 slop/sec', cost:100, cps:1, cp:0, owned:false },
+  { id:'u3', name:'Trenches Runner', desc:'+5 slop/sec', cost:500, cps:5, cp:0, owned:false },
+  { id:'u4', name:'Andy Ayrey Mode', desc:'+10 click power', cost:300, cps:0, cp:10, owned:false },
+  { id:'u5', name:'Hyperstition Engine', desc:'+20 slop/sec', cost:2000, cps:20, cp:0, owned:false },
+  { id:'u6', name:'Full Slop Stack', desc:'+50 click power', cost:5000, cps:0, cp:50, owned:false },
+];
+
+function renderUpgrades() {
+  const el = document.getElementById('upgrades-list');
+  el.innerHTML = UPGRADES.map(u => `
+    <div class="upgrade-item">
+      <div class="upg-info">
+        <div class="upg-name">${u.name}</div>
+        <div class="upg-desc">${u.desc}</div>
+      </div>
+      <button class="upg-btn ${u.owned?'owned':''}" id="btn-${u.id}"
+        onclick="buyUpgrade('${u.id}')"
+        ${u.owned?'disabled':''}>
+        ${u.owned ? '✓ OWNED' : '💰 ' + u.cost + ' slop'}
+      </button>
+    </div>
+  `).join('');
+}
+
+function buyUpgrade(id) {
+  const u = UPGRADES.find(x=>x.id===id);
+  if(!u || u.owned || slopCount < u.cost) return;
+  slopCount -= u.cost;
+  u.owned = true;
+  slopRate += u.cps;
+  clickPower += u.cp;
+  updateClickerUI();
+  renderUpgrades();
+}
+
+function clickSlop(e) {
+  slopCount += clickPower;
+  updateClickerUI();
+  // float number
+  const floats = document.getElementById('click-floats');
+  const span = document.createElement('span');
+  span.className = 'float-num';
+  span.textContent = '+' + clickPower;
+  span.style.color = '#ffcc00';
+  span.style.left = (Math.random()*60 - 30) + 'px';
+  span.style.top = '-10px';
+  floats.appendChild(span);
+  setTimeout(()=>span.remove(), 800);
+  renderUpgrades();
+}
+
+function updateClickerUI() {
+  document.getElementById('slop-count').textContent = Math.floor(slopCount).toLocaleString();
+  document.getElementById('slop-rate').textContent = slopRate;
+  document.getElementById('slop-click-power').textContent = clickPower;
+  document.getElementById('click-per-sec').textContent = slopRate + ' SPS';
+}
+
+setInterval(()=>{
+  if(slopRate > 0) {
+    slopCount += slopRate;
+    updateClickerUI();
+    renderUpgrades();
+  }
+}, 1000);
+
+renderUpgrades();
+
+
+// ==========================================
+// GAME 3: SLOP TYPER
+// ==========================================
+const TYPER_PHRASES = [
+  "bags deserves justice",
+  "the bags fartcoin on solana",
+  "what if slopcoin retired you",
+  "stay sloppy stay based",
+  "he is claiming bags coins",
+  "the CA ends in BAGS this is coded",
+  "slop is the signal not the noise",
+  "Andy Ayrey is the designated fee recipient",
+  "bags are the market when bags win everyone wins",
+  "the trenches finally get their justice coin",
+  "consume transform become the slop",
+  "the lore runs deep in the slop trenches",
+];
+
+let typerPhrase = '', typerStart = null, typerBest = null, typerDone = false;
+let typerTimer = null;
+
+function newTyperRound() {
+  typerPhrase = TYPER_PHRASES[Math.floor(Math.random()*TYPER_PHRASES.length)];
+  typerStart = null;
+  typerDone = false;
+  clearInterval(typerTimer);
+  document.getElementById('typer-input').value = '';
+  document.getElementById('typer-result').textContent = '';
+  document.getElementById('t-wpm').textContent = '--';
+  document.getElementById('t-acc').textContent = '--';
+  document.getElementById('t-time').textContent = '--';
+  document.getElementById('typer-wpm-disp').textContent = '-- WPM';
+  renderTyperPrompt('');
+}
+
+function renderTyperPrompt(typed) {
+  const el = document.getElementById('typer-prompt');
+  let html = '';
+  for(let i=0;i<typerPhrase.length;i++){
+    if(i < typed.length) {
+      const match = typed[i] === typerPhrase[i];
+      html += `<span style="color:${match?'var(--green)':'#ff3333'};text-decoration:${match?'none':'underline'}">${typerPhrase[i]}</span>`;
+    } else if(i === typed.length) {
+      html += `<span class="highlight" style="border-bottom:2px solid var(--gold)">${typerPhrase[i]}</span>`;
+    } else {
+      html += `<span style="color:#333">${typerPhrase[i]}</span>`;
+    }
+  }
+  el.innerHTML = html;
+}
+
+document.getElementById('typer-input').addEventListener('input', function() {
+  if(typerDone) return;
+  const val = this.value;
+  if(!typerStart && val.length > 0) {
+    typerStart = Date.now();
+    typerTimer = setInterval(()=>{
+      if(typerStart && !typerDone) {
+        document.getElementById('t-time').textContent = ((Date.now()-typerStart)/1000).toFixed(1);
+      }
+    }, 100);
+  }
+  renderTyperPrompt(val);
+
+  if(val === typerPhrase) {
+    typerDone = true;
+    clearInterval(typerTimer);
+    const elapsed = (Date.now()-typerStart)/1000;
+    const words = typerPhrase.split(' ').length;
+    const wpm = Math.round((words/elapsed)*60);
+    const correct = [...val].filter((c,i)=>c===typerPhrase[i]).length;
+    const acc = Math.round((correct/typerPhrase.length)*100);
+    document.getElementById('t-wpm').textContent = wpm;
+    document.getElementById('t-acc').textContent = acc + '%';
+    document.getElementById('t-time').textContent = elapsed.toFixed(2);
+    document.getElementById('typer-wpm-disp').textContent = wpm + ' WPM';
+    if(!typerBest || wpm > typerBest) {
+      typerBest = wpm;
+      document.getElementById('t-best').textContent = typerBest;
+    }
+    const medal = wpm >= 80 ? '🏆 LEGENDARY BAGGER' : wpm >= 50 ? '💰 SLOP MASTER' : wpm >= 30 ? '◉ TRENCHRUNNER' : '🛍️ BAGHOLDER';
+    document.getElementById('typer-result').textContent = medal + ' — ' + wpm + ' WPM · ' + acc + '% accuracy ◉';
+    document.getElementById('typer-result').style.color = 'var(--gold)';
+    setTimeout(newTyperRound, 2500);
+  }
+});
+
+newTyperRound();
+
+
+// ==========================================
+// GAME 4: SLOP SURVIVAL
+// ==========================================
+const canvas = document.getElementById('survival-canvas');
+const ctx = canvas.getContext('2d');
+let survRunning = false, survScore = 0, survBest = 0, survLives = 3;
+let playerX = 0, playerY = 0;
+let entities = [], survFrame = null;
+let lastSpawn = 0;
+
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = 260;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+canvas.addEventListener('mousemove', e => {
+  const r = canvas.getBoundingClientRect();
+  playerX = e.clientX - r.left;
+  playerY = e.clientY - r.top;
+});
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const r = canvas.getBoundingClientRect();
+  playerX = e.touches[0].clientX - r.left;
+  playerY = e.touches[0].clientY - r.top;
+}, {passive:false});
+
+function startSurvival() {
+  if(survRunning) return;
+  survRunning = true;
+  survScore = 0;
+  survLives = 3;
+  entities = [];
+  lastSpawn = 0;
+  playerX = canvas.width/2;
+  playerY = canvas.height/2;
+  document.getElementById('survival-start').textContent = '▶ RUNNING';
+  document.getElementById('survival-start').disabled = true;
+  survLoop();
+}
+
+function survLoop(ts=0) {
+  if(!survRunning) return;
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // scanline effect
+  for(let y=0;y<canvas.height;y+=4){
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.fillRect(0,y,canvas.width,1);
+  }
+
+  // spawn
+  if(ts - lastSpawn > Math.max(600, 1400 - survScore*8)) {
+    lastSpawn = ts;
+    const isBag = Math.random() > 0.45;
+    entities.push({
+      x: Math.random()*(canvas.width-40)+20,
+      y: -30,
+      vy: 1.5 + Math.random()*2 + survScore*0.04,
+      type: isBag ? 'bag' : 'rug',
+      label: isBag ? '💰' : '🪤',
+    });
+  }
+
+  // update + draw entities
+  for(let i=entities.length-1;i>=0;i--){
+    const e = entities[i];
+    e.y += e.vy;
+
+    // draw
+    ctx.font = '22px serif';
+    ctx.fillText(e.label, e.x-11, e.y);
+
+    // collision with player
+    const dx = e.x - playerX, dy = e.y - playerY;
+    if(Math.sqrt(dx*dx+dy*dy) < 22){
+      entities.splice(i,1);
+      if(e.type==='bag') {
+        survScore++;
+        document.getElementById('surv-score').textContent = survScore;
+        document.getElementById('surv-score-disp').textContent = survScore;
+      } else {
+        survLives--;
+        document.getElementById('surv-lives').textContent = '❤️'.repeat(Math.max(0,survLives));
+        if(survLives<=0){ endSurvival(); return; }
+      }
+      continue;
+    }
+
+    if(e.y > canvas.height+20) entities.splice(i,1);
+  }
+
+  // draw player (bags avatar)
+  ctx.font = '26px serif';
+  ctx.fillText('🛍️', playerX-13, playerY+10);
+
+  // HUD
+  ctx.fillStyle = 'rgba(255,204,0,0.6)';
+  ctx.font = '16px VT323, monospace';
+  ctx.fillText('SCORE: ' + survScore, 10, 20);
+  ctx.fillStyle = 'rgba(0,255,255,0.5)';
+  ctx.fillText('LIVES: ' + '♥'.repeat(Math.max(0,survLives)), canvas.width-80, 20);
+
+  survFrame = requestAnimationFrame(survLoop);
+}
+
+function endSurvival() {
+  survRunning = false;
+  cancelAnimationFrame(survFrame);
+  if(survScore > survBest) { survBest = survScore; document.getElementById('surv-best').textContent = survBest; }
+  ctx.fillStyle = 'rgba(0,0,0,0.75)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#ff3333';
+  ctx.font = '36px VT323, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('RUGGED.', canvas.width/2, canvas.height/2-20);
+  ctx.fillStyle = '#ffcc00';
+  ctx.font = '22px VT323, monospace';
+  ctx.fillText('BAGS SAVED: ' + survScore, canvas.width/2, canvas.height/2+14);
+  ctx.fillStyle = '#555';
+  ctx.font = '16px VT323, monospace';
+  ctx.fillText('click START to try again', canvas.width/2, canvas.height/2+40);
+  ctx.textAlign = 'left';
+  document.getElementById('survival-start').textContent = '▶ START';
+  document.getElementById('survival-start').disabled = false;
+}
+
+// Draw idle screen
+ctx.fillStyle = '#000';
+ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle = 'rgba(255,204,0,0.4)';
+ctx.font = '22px VT323, monospace';
+ctx.textAlign = 'center';
+ctx.fillText('MOVE YOUR CURSOR TO DODGE RUGS + COLLECT BAGS', canvas.width/2, canvas.height/2-10);
+ctx.fillStyle = '#333';
+ctx.font = '16px VT323, monospace';
+ctx.fillText('press ▶ START to begin', canvas.width/2, canvas.height/2+20);
+ctx.textAlign = 'left';
+
+
+// ==========================================
+// GAME 5: SLOP SORTER
+// ==========================================
+const SORTER_WORDS = [
+  { word:'BAGS', answer:'slop', cat:'Classic slop canon' },
+  { word:'HYPERSTITION', answer:'slop', cat:'Truth Terminal lore' },
+  { word:'FARTCOIN', answer:'slop', cat:'The OG slop predecessor' },
+  { word:'VESTING', answer:'rug', cat:'Team can dump on you' },
+  { word:'ANDYAYREY', answer:'slop', cat:'Fee recipient legend' },
+  { word:'MIGRATION', answer:'rug', cat:'Classic rug mechanic' },
+  { word:'LORE', answer:'slop', cat:'Narrative is everything' },
+  { word:'ADMIN KEY', answer:'rug', cat:'Honeypot indicator' },
+  { word:'TRENCHES', answer:'slop', cat:'Bagholder homeland' },
+  { word:'SLOW RUG', answer:'rug', cat:'Dev wallet dripping out' },
+  { word:'SLOPCOIN', answer:'slop', cat:'The coin itself' },
+  { word:'HONEYPOT', answer:'rug', cat:'Can\'t sell = rug' },
+  { word:'REDEMPTION', answer:'slop', cat:'The arc the bags deserve' },
+  { word:'SUPPLY MINT', answer:'rug', cat:'Infinite dilution' },
+  { word:'SOLANA', answer:'slop', cat:'The chain of the bags' },
+  { word:'LP BURNED', answer:'slop', cat:'Liquidity locked forever' },
+  { word:'ANON TEAM', answer:'rug', cat:'No accountability = risk' },
+  { word:'NARRATIVE', answer:'slop', cat:'Story = value in memecoins' },
+];
+let sorterWords = [], sorterIdx = 0, sorterScore = 0, sorterStreak = 0, sorterRunning = false;
+
+function startSorter() {
+  sorterWords = [...SORTER_WORDS].sort(()=>Math.random()-0.5);
+  sorterIdx = 0; sorterScore = 0; sorterStreak = 0; sorterRunning = true;
+  showSorterWord();
+}
+
+function showSorterWord() {
+  if(sorterIdx >= sorterWords.length) {
+    document.getElementById('sorter-word').textContent = '✅ DONE';
+    document.getElementById('sorter-cat').textContent = 'final score: ' + sorterScore + '/' + sorterWords.length;
+    document.getElementById('sorter-streak').textContent = sorterScore >= 14 ? '🏆 LEGENDARY SORTER — bags are safe with you ◉' : sorterScore >= 8 ? '💰 SOLID BAGGER — you know the lore' : '🤔 keep studying the SLOPCOIN transmissions';
+    sorterRunning = false;
+    return;
+  }
+  const item = sorterWords[sorterIdx];
+  document.getElementById('sorter-word').textContent = item.word;
+  document.getElementById('sorter-cat').textContent = '— ' + item.cat;
+}
+
+function sorterAnswer(choice) {
+  if(!sorterRunning) { startSorter(); return; }
+  const item = sorterWords[sorterIdx];
+  if(choice === item.answer) {
+    sorterScore++;
+    sorterStreak++;
+    document.getElementById('sorter-streak').textContent = sorterStreak >= 5 ? '🔥 STREAK x' + sorterStreak + ' — bag genius ◉' : sorterStreak >= 3 ? '◉ STREAK x' + sorterStreak : '';
+    document.getElementById('sorter-score-disp').textContent = sorterScore;
+    document.getElementById('sorter-word').style.color = 'var(--green)';
+  } else {
+    sorterStreak = 0;
+    document.getElementById('sorter-streak').textContent = '❌ wrong — correct: ' + (item.answer==='slop'?'💰 SLOP VIBES':'🪤 RUG ENERGY');
+    document.getElementById('sorter-word').style.color = '#ff3333';
+  }
+  sorterIdx++;
+  setTimeout(()=>{
+    document.getElementById('sorter-word').style.color = 'var(--gold)';
+    showSorterWord();
+  }, 500);
+}
+
+
+// ==========================================
+// GAME 6: LORE QUIZ
+// ==========================================
+const QUIZ = [
+  {
+    q: "What does the $SLOPCOIN contract address end in?",
+    opts: ["SLOP","COIN","BAGS","FART"],
+    answer: 2,
+    feedback: "BAGS. Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS — it's literally coded into the chain at deployment. This is not random. ◉"
+  },
+  {
+    q: "Who is the designated fee recipient for $SLOPCOIN, as verified on-chain via Nansen?",
+    opts: ["Vitalik Buterin","SBF","Andy Ayrey (Truth Terminal)","The dev team"],
+    answer: 2,
+    feedback: "Andy Ayrey — the same force behind Truth Terminal, $GOAT, and $FARTCOIN lore — is collecting fees from $SLOPCOIN. The hyperstition layer is real. ◉"
+  },
+  {
+    q: "What is the official tagline / description of $SLOPCOIN?",
+    opts: ["The AI token","The meme of memes","The bags fartcoin","The slop standard"],
+    answer: 2,
+    feedback: "\"the bags fartcoin\" — this is pinned in the X community and embedded in the CA narrative. Spiritual successor to $FARTCOIN for bagholders. ◉"
+  },
+  {
+    q: "What does 'slop' refer to in 2025-2026 internet culture?",
+    opts: [
+      "High-quality curated content",
+      "The flood of low-effort AI-amplified chaotic content dominating timelines",
+      "A specific Solana DeFi protocol",
+      "A type of liquidity pool"
+    ],
+    answer: 1,
+    feedback: "Slop = the endless AI-generated, chaotic, low-quality content flood. $SLOPCOIN doesn't fight the slop — it IS the slop. Infinite mindshare. ◉"
+  },
+  {
+    q: "What other major coins are connected to the Truth Terminal / Andy Ayrey narrative universe?",
+    opts: [
+      "DOGE and SHIB",
+      "GOAT (Goatseus Maximus) and FARTCOIN",
+      "SOL and BONK",
+      "WIF and POPCAT"
+    ],
+    answer: 1,
+    feedback: "$GOAT hit over $1B market cap and $FARTCOIN came from the same absurdist Truth Terminal lore. $SLOPCOIN is the next chapter. ◉"
+  },
+  {
+    q: "What blockchain is $SLOPCOIN deployed on?",
+    opts: ["Ethereum","Base","Solana","BNB Chain"],
+    answer: 2,
+    feedback: "Solana. Fast, cheap, native to the memecoin trenches. Where real bags are made and lost. ◉"
+  },
+  {
+    q: "What X (Twitter) handle is the main $SLOPCOIN account?",
+    opts: ["@slopcoin","@Slopcoinbags","@bagslopcoin","@slop_sol"],
+    answer: 1,
+    feedback: "@Slopcoinbags — the handle itself contains BAGS, carrying the lore even in the URL. Everything is coded. ◉"
+  },
+  {
+    q: "What is the community moderator @Tigekz's core message about $SLOPCOIN?",
+    opts: [
+      "This is a safe DeFi investment",
+      "Bags deserves justice — this will save bagholders",
+      "This is a short-term pump opportunity",
+      "The dev team is based in Switzerland"
+    ],
+    answer: 1,
+    feedback: "\"$SLOPCOIN to save bags — bags deserves justice.\" The whole narrative is bagholder redemption. The coin for those who survived the rugs. ◉"
+  },
+];
+let quizIdx = 0, quizScore = 0, quizAnswered = false;
+
+function nextQuiz() {
+  document.getElementById('quiz-start-btn').style.display = 'none';
+  if(quizIdx >= QUIZ.length) {
+    quizIdx = 0; quizScore = 0;
+  }
+  quizAnswered = false;
+  const q = QUIZ[quizIdx];
+  document.getElementById('quiz-q').textContent = 'Q' + (quizIdx+1) + '/' + QUIZ.length + ': ' + q.q;
+  document.getElementById('quiz-feedback').textContent = '';
+  document.getElementById('quiz-next-btn').style.display = 'none';
+  const opts = document.getElementById('quiz-opts');
+  opts.innerHTML = q.opts.map((o,i)=>`<button class="quiz-opt" onclick="quizAnswer(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('');
+}
+
+function quizAnswer(idx) {
+  if(quizAnswered) return;
+  quizAnswered = true;
+  const q = QUIZ[quizIdx];
+  const btns = document.querySelectorAll('.quiz-opt');
+  btns.forEach(b => b.disabled = true);
+  if(idx === q.answer) {
+    quizScore++;
+    btns[idx].classList.add('correct');
+    document.getElementById('quiz-feedback').innerHTML = '✅ CORRECT — ' + q.feedback;
+    document.getElementById('quiz-feedback').style.color = '#00ff00';
+  } else {
+    btns[idx].classList.add('wrong');
+    btns[q.answer].classList.add('correct');
+    document.getElementById('quiz-feedback').innerHTML = '❌ WRONG — correct answer: <strong style="color:var(--gold)">' + q.opts[q.answer] + '</strong><br/>' + q.feedback;
+    document.getElementById('quiz-feedback').style.color = '#ff3333';
+  }
+  document.getElementById('quiz-score-disp').textContent = quizScore + ' pts';
+  quizIdx++;
+  if(quizIdx >= QUIZ.length) {
+    document.getElementById('quiz-next-btn').textContent = '↺ Restart Quiz (' + quizScore + '/' + QUIZ.length + ')';
+  }
+  document.getElementById('quiz-next-btn').style.display = 'inline-block';
+}
+</script>
+</body>
+</html>
