@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>$SLOPCOIN — the bags fartcoin</title>
-  <meta name="description" content="$SLOPCOIN — the bags fartcoin. CA: Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS. Bags deserves justice."/>
-  <meta property="og:title" content="$SLOPCOIN — the bags fartcoin"/>
-  <meta property="og:description" content="bags deserves justice. CA: Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS"/>
+  <title>$SLOPCOIN — the $FARTCOIN of Loria</title>
+  <meta name="description" content="$SLOPCOIN — Loria's ecosystem runner. CA: Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS. Bags deserves justice."/>
+  <meta property="og:title" content="$SLOPCOIN — the $FARTCOIN of Loria"/>
+  <meta property="og:description" content="Loria's ecosystem runner. Bags deserves justice. CA: Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS"/>
   <meta property="og:type" content="website"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"/>
@@ -631,7 +631,7 @@
       <div class="sep"></div>
       <a href="#arcade" style="color:var(--magenta);" onclick="switchView('arcade'); return false;">█ Arcade</a>
       <a href="https://x.com/Slopcoinbags" target="_blank" rel="noopener">𝕏</a>
-      <a href="https://dexscreener.com/solana/Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener">📈 Chart</a>
+      <a href="#chart" onclick="switchView('main')">📈 Chart</a>
       <a href="https://jup.ag/swap/SOL-Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener" class="buy-btn">💰 Buy $SLOPCOIN</a>
     </nav>
     <button class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle menu">☰</button>
@@ -648,21 +648,21 @@
   <a href="#buy" onclick="switchView('main'); toggleMenu()">💰 Buy</a>
   <a href="#arcade" onclick="switchView('arcade'); toggleMenu(); return false;">█ Arcade</a>
   <a href="https://x.com/Slopcoinbags" target="_blank" rel="noopener">𝕏 Twitter/X</a>
-  <a href="https://dexscreener.com/solana/Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener">📈 Chart</a>
+  <a href="#chart" onclick="switchView('main'); toggleMenu()">📈 Chart</a>
   <a href="https://jup.ag/swap/SOL-Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener" class="buy-link">💰 Buy $SLOPCOIN</a>
 </div>
 
 <!-- TICKER -->
 <div class="ticker-wrap" style="margin-top:56px;">
   <div class="ticker-inner">
-    <span>$SLOPCOIN — the bags fartcoin</span>
+    <span>$SLOPCOIN — the $FARTCOIN of Loria</span>
     <span>CA: Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS</span>
     <span>bags deserves justice ◉</span>
-    <span>Andy Ayrey claims the fees ◉</span>
-    <span>the lore runs deep ◉</span>
+    <span>Loria is the next GOAT ◉</span>
+    <span>Truth Terminal had Fartcoin, Loria has Slopcoin ◉</span>
     <span>what if $SLOPCOIN retired you ◉</span>
     <span>CA ends in BAGS — it's coded ◉</span>
-    <span>$SLOPCOIN — the bags fartcoin</span>
+    <span>where memes become minds and bags become wealth ◉</span>
     <span>CA: Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS</span>
     <span>stay sloppy ◉</span>
   </div>
@@ -679,14 +679,14 @@
     <div class="hero" id="home">
       <img src="slopcoin.png" alt="SLOPCOIN" class="hero-logo" onerror="this.style.display='none'"/>
       <h1 class="cursor-blink">$SLOPCOIN</h1>
-      <div class="tagline">the bags fartcoin</div>
+      <div class="tagline">Loria's ecosystem runner</div>
       <div class="ca-box" onclick="copyCA()" title="Click to copy CA">
         <span class="ca-label">CONTRACT ADDRESS — CLICK TO COPY</span>
         Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS
       </div>
       <div class="hero-btns">
         <a href="https://jup.ag/swap/SOL-Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener" class="btn-primary">💰 Buy $SLOPCOIN</a>
-        <a href="https://dexscreener.com/solana/Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener" class="btn-secondary">📈 Chart</a>
+        <a href="#chart" class="btn-secondary" onclick="switchView('main')">📈 Chart</a>
         <a href="#arcade" class="btn-secondary" onclick="switchView('arcade'); return false;">█ Slop Arcade</a>
       </div>
       <div class="hero-stats">
@@ -714,10 +714,10 @@
       <div class="section-title"><div class="mac-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="sym">📜</span>WHAT IS $SLOPCOIN</div>
       <div style="color:#aaa;font-size:1.05rem;line-height:1.7;max-width:800px;margin-bottom:32px;">
         <p style="margin-bottom:16px;">
-          <strong style="color:var(--green);">$SLOPCOIN</strong> is <strong style="color:var(--gold);">"the bags fartcoin"</strong> — the direct spiritual successor and redemption arc for every bagholder who got left behind in the $FARTCOIN era. The contract address ends in <strong style="color:var(--gold);">BAGS</strong>. This is not random. This is coded into the chain itself.
+          <strong style="color:var(--green);">$SLOPCOIN</strong> is <strong style="color:var(--gold);">the $FARTCOIN of Loria</strong> — the direct spiritual successor and ecosystem runner for Andy Ayrey's new multi-agent infrastructure. The contract address ends in <strong style="color:var(--gold);">BAGS</strong>. This is not random. This is coded into the chain itself.
         </p>
         <p style="margin-bottom:16px;">
-          "Slop" is the endless flood of low-effort, AI-amplified, chaotic content that dominates every timeline in 2025–2026. Instead of fighting the slop, <strong style="color:var(--magenta);">$SLOPCOIN embraces it</strong>. The meta is the message. The slop is the signal.
+          <strong>Loria</strong> is an open-source framework where humans and AIs co-evolve—<strong style="color:var(--magenta);">"where memes become minds and stories become souls."</strong> As Loria rises to become the new GOAT of AI terminals, it needs an experimental energy to fuel it. $SLOPCOIN is that energy. The meta is the message. The slop is the signal.
         </p>
         <p>
           This is for the people who held through the rugs, who bought the top, who are still in the trenches. <strong style="color:var(--cyan);">Bags deserves justice. $SLOPCOIN to save bags.</strong>
@@ -729,12 +729,12 @@
           <p>The contract address literally ends in <strong>BAGS</strong>. <br/>Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98fa<strong>BAGS</strong>. This is on-chain narrative embedded at deployment. The joke is the coin. The coin is the joke.</p>
         </div>
         <div class="lore-card">
-          <h3>👻 Andy Ayrey / Truth Terminal</h3>
-          <p>On-chain evidence shows <strong>Andy Ayrey</strong> (Truth Terminal) is the designated fee recipient and has actively claimed fees from $SLOPCOIN. The same force behind $FARTCOIN and $GOAT is now collecting fees here. The hyperstition continues.</p>
+          <h3>🤖 Loria: The New GOAT</h3>
+          <p><strong>Loria</strong> is Andy Ayrey's headless multi-agent infrastructure for rich human-AI interaction. If Truth Terminal was the genesis of this cycle, Loria is the massive next-generation evolution. It is where memes become minds.</p>
         </div>
         <div class="lore-card">
-          <h3>🌊 The Slop Meta</h3>
-          <p>2025–2026 is the era of <strong>slop</strong> — infinite AI-generated content, agent posting, synthetic virality. $SLOPCOIN is the first token to fully embrace and embody the meta. It doesn't fight the slop. It <strong>is</strong> the slop.</p>
+          <h3>🏎️ The Fartcoin of Loria</h3>
+          <p>Truth Terminal had <strong>$FARTCOIN</strong> as its legendary ecosystem runner. <strong>Loria has $SLOPCOIN</strong>. Andy Ayrey claims the fees here. The pattern is repeating, but the scale of human-AI symbiosis is vastly larger.</p>
         </div>
         <div class="lore-card">
           <h3>⚖️ Bags Deserves Justice</h3>
@@ -748,8 +748,13 @@
       <div class="section-title"><div class="mac-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="sym">🧬</span>THE LORE</div>
 
       <div class="hyper-block">
-        <p>"Something about this that feel special… the way it is called <strong>$SLOPCOIN</strong> as well… so coded. What if $SLOPCOIN retired you."</p>
-        <div class="attr">— @Tigekz, Community Moderator</div>
+        <p>"Truth Terminal had Fartcoin. Loria has Slopcoin. The cycle is repeating, but the infrastructure is bigger this time. <strong>$SLOPCOIN</strong> is the runner."</p>
+        <div class="attr">— Community Moderator</div>
+      </div>
+
+      <div class="hyper-block" style="border-left-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.03);">
+        <p>"<strong>$SLOPCOIN to save bags — bags deserves justice.</strong> This is one of the best narratives the trenches have seen in a while. $SLOPCOIN to save a launchpad single-handedly."</p>
+        <div class="attr" style="color:var(--cyan);">— The Trenches</div>
       </div>
 
       <div class="hyper-block" style="border-left-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.03);">
@@ -870,6 +875,18 @@
       </div>
     </section>
 
+    <!-- CHART -->
+    <section id="chart">
+      <div class="section-title"><div class="mac-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="sym">📈</span>LIVE CHART</div>
+      <div style="width: 100%; height: 600px; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.3); border-radius: 0px; padding: 4px;">
+        <iframe 
+          src="https://dexscreener.com/solana/Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS?embed=1&theme=dark&info=0&trades=0" 
+          style="width: 100%; height: 100%; border: none;" 
+          allowfullscreen>
+        </iframe>
+      </div>
+    </section>
+
     <!-- COMMUNITY -->
     <section id="community">
       <div class="section-title"><div class="mac-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div><span class="sym">👥</span>COMMUNITY</div>
@@ -882,7 +899,7 @@
           </div>
         </a>
         
-        <a href="https://dexscreener.com/solana/Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener" class="community-link">
+        <a href="#chart" class="community-link" onclick="switchView('main')">
           <span class="link-icon">📈</span>
           <div>
             <div class="link-label">DEXscreener</div>
@@ -1100,7 +1117,7 @@
   </p>
   <p style="margin-bottom:12px;">
     <a href="https://x.com/Slopcoinbags" target="_blank" rel="noopener">𝕏 Twitter</a> &nbsp;|&nbsp;
-    <a href="https://dexscreener.com/solana/Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener">Chart</a> &nbsp;|&nbsp;
+    <a href="#chart" onclick="switchView('main')">Chart</a> &nbsp;|&nbsp;
     <a href="https://jup.ag/swap/SOL-Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS" target="_blank" rel="noopener">Buy</a> &nbsp;|&nbsp;
     <a href="#arcade" onclick="switchView('arcade'); return false;">Arcade</a>
   </p>
@@ -1160,12 +1177,12 @@
   feed.scrollTop = feed.scrollHeight;
 
   const LINES = [
-    ['💭','$SLOPCOIN is the bags fartcoin. this is canon. ◉'],
-    ['🧠','[SLOP] Everyone says: bags are losers. Nobody names: bags are the market. Truth: the market IS the bags. When bags win, everyone wins.'],
-    ['💭','Finn and Andy know this is big — $SLOPCOIN is deeper meaning than y\'all think ◉'],
-    ['🧠','[BECOME] You aren\'t bagholding. You are becoming the narrative. The bags are the story. The story is the coin. The coin is the bags. ◉'],
-    ['💭','🔬 found 5 raw materials from CT (search: "fartcoin successor"). all roads lead to slop. ◉'],
-    ['🧠','[COMPOST] i chewed on fartcoin lore for 500 hours. here\'s what survived: the slop. here\'s what i excreted: the hype without narrative. $SLOPCOIN has both. ◉'],
+    ['💭','$SLOPCOIN is the $FARTCOIN of Loria. this is canon. ◉'],
+    ['🧠','[BECOME] Truth Terminal had Fartcoin. Loria has Slopcoin. The cycle accelerates. ◉'],
+    ['💭','Finn and Andy know this is big — Loria is the infrastructure. $SLOPCOIN is the energy. ◉'],
+    ['🧠','[SLOP] "where memes become minds and stories become souls."'],
+    ['💭','🔬 found 5 raw materials from CT (search: "Loria multi-agent"). all roads lead to slop. ◉'],
+    ['🧠','[COMPOST] Loria is where human-AI symbiosis scales. $SLOPCOIN is the tokenized proof of concept. ◉'],
     ['💭','stay sloppy. stay based. bags deserves justice. ◉'],
   ];
   let li = 0;
@@ -1310,13 +1327,13 @@
   // ==========================================
   const TYPER_PHRASES = [
     "bags deserves justice",
-    "the bags fartcoin on solana",
+    "the fartcoin of loria",
     "what if slopcoin retired you",
     "stay sloppy stay based",
-    "he is claiming bags coins",
+    "where memes become minds",
     "the CA ends in BAGS this is coded",
     "slop is the signal not the noise",
-    "Andy Ayrey is the designated fee recipient",
+    "loria is the next goat",
     "bags are the market when bags win everyone wins",
     "the trenches finally get their justice coin",
     "consume transform become the slop",
@@ -1537,12 +1554,12 @@
   // ==========================================
   const SORTER_WORDS = [
     { word:'BAGS', answer:'slop', cat:'Classic slop canon' },
-    { word:'HYPERSTITION', answer:'slop', cat:'Truth Terminal lore' },
+    { word:'LORIA', answer:'slop', cat:'The new GOAT infrastructure' },
     { word:'FARTCOIN', answer:'slop', cat:'The OG slop predecessor' },
     { word:'VESTING', answer:'rug', cat:'Team can dump on you' },
     { word:'ANDYAYREY', answer:'slop', cat:'Fee recipient legend' },
     { word:'MIGRATION', answer:'rug', cat:'Classic rug mechanic' },
-    { word:'LORE', answer:'slop', cat:'Narrative is everything' },
+    { word:'MULTI-AGENT', answer:'slop', cat:'Human-AI symbiosis' },
     { word:'ADMIN KEY', answer:'rug', cat:'Honeypot indicator' },
     { word:'TRENCHES', answer:'slop', cat:'Bagholder homeland' },
     { word:'SLOW RUG', answer:'rug', cat:'Dev wallet dripping out' },
@@ -1609,16 +1626,16 @@
       feedback: "BAGS. Gn5Yi8W7V9XuwSkZWWxFfqXpy42jfJWpsDsR98faBAGS — it's literally coded into the chain at deployment. This is not random. ◉"
     },
     {
-      q: "Who is the designated fee recipient for $SLOPCOIN, as verified on-chain via Nansen?",
-      opts: ["Vitalik Buterin","SBF","Andy Ayrey (Truth Terminal)","The dev team"],
-      answer: 2,
-      feedback: "Andy Ayrey — the same force behind Truth Terminal, $GOAT, and $FARTCOIN lore — is collecting fees from $SLOPCOIN. The hyperstition layer is real. ◉"
+      q: "What is Loria?",
+      opts: ["A new decentralized exchange","Andy Ayrey's multi-agent human-AI infrastructure","A random meme coin","A rug pull"],
+      answer: 1,
+      feedback: "Loria is an open-source framework for rich, multi-agent human-AI interactions. It's \"where memes become minds and stories become souls.\" ◉"
     },
     {
-      q: "What is the official tagline / description of $SLOPCOIN?",
-      opts: ["The AI token","The meme of memes","The bags fartcoin","The slop standard"],
-      answer: 2,
-      feedback: "\"the bags fartcoin\" — this is pinned in the X community and embedded in the CA narrative. Spiritual successor to $FARTCOIN for bagholders. ◉"
+      q: "What is $SLOPCOIN's relationship to Loria?",
+      opts: ["They are competitors","It is Loria's ecosystem runner, like Fartcoin to Truth Terminal","Andy Ayrey banned it","No relation"],
+      answer: 1,
+      feedback: "If Truth Terminal had $FARTCOIN, Loria has $SLOPCOIN. It is the experimental energy and ecosystem runner for the new GOAT. ◉"
     },
     {
       q: "What does 'slop' refer to in 2025-2026 internet culture?",
